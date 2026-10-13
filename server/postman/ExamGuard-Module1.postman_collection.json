@@ -1,0 +1,369 @@
+{
+  "info": {
+    "name": "ExamGuard Module 1 API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "userId",
+      "value": ""
+    },
+    {
+      "key": "examId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "Login (admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('token', pm.response.json().data.token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"YourAdminPassword1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Me",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/me"
+      }
+    },
+    {
+      "name": "Change password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"currentPassword\": \"OldPassword123\",\n  \"newPassword\": \"NewPassword12345\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/change-password"
+      }
+    },
+    {
+      "name": "Logout (client-side)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout"
+      }
+    },
+    {
+      "name": "Create user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('userId', pm.response.json().data.user.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Cust One\",\n  \"email\": \"cust1@example.com\",\n  \"password\": \"CustodianPass123\",\n  \"role\": \"Custodian\"\n}"
+        },
+        "url": "{{baseUrl}}/api/users"
+      }
+    },
+    {
+      "name": "List users",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users?role=Custodian&page=1&limit=20"
+      }
+    },
+    {
+      "name": "Get user",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/users/{{userId}}"
+      }
+    },
+    {
+      "name": "Update user",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Renamed Person\"\n}"
+        },
+        "url": "{{baseUrl}}/api/users/{{userId}}"
+      }
+    },
+    {
+      "name": "Set user status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isActive\": false\n}"
+        },
+        "url": "{{baseUrl}}/api/users/{{userId}}/status"
+      }
+    },
+    {
+      "name": "Set user role",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"role\": \"Investigator\"\n}"
+        },
+        "url": "{{baseUrl}}/api/users/{{userId}}/role"
+      }
+    },
+    {
+      "name": "Create examination",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('examId', pm.response.json().data.examination.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Mathematics Final\",\n  \"examinationCode\": \"MATH-2027-01\",\n  \"description\": \"Mock exam\",\n  \"scheduledDateTime\": \"2027-03-01T09:00:00.000Z\",\n  \"assignedCustodians\": []\n}"
+        },
+        "url": "{{baseUrl}}/api/examinations"
+      }
+    },
+    {
+      "name": "List examinations",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/examinations"
+      }
+    },
+    {
+      "name": "Get examination",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/examinations/{{examId}}"
+      }
+    },
+    {
+      "name": "Update examination",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Mathematics Final (Revised)\"\n}"
+        },
+        "url": "{{baseUrl}}/api/examinations/{{examId}}"
+      }
+    },
+    {
+      "name": "Set examination status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"Scheduled\"\n}"
+        },
+        "url": "{{baseUrl}}/api/examinations/{{examId}}/status"
+      }
+    },
+    {
+      "name": "Audit logs (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/audit-logs?outcome=failure"
+      }
+    },
+    {
+      "name": "Placeholder: custody (501)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/custody/anything"
+      }
+    },
+    {
+      "name": "Placeholder: investigations (501)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/investigations/anything"
+      }
+    }
+  ]
+}

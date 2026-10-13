@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExamGuard — Module 1 Admin & Core Infrastructure</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-shield">
+        <span class="shield-icon">🛡️</span>
+      </div>
+      <div>
+        <h1 class="brand-title">ExamGuard</h1>
+        <p class="brand-subtitle">Module 1: Core System Infrastructure & Administration</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="healthBadge" class="health-badge checking">
+        <span class="dot"></span>
+        <span id="healthStatusText">Checking Backend...</span>
+      </div>
+      <div id="headerUserInfo" class="header-user-info hidden">
+        <div class="user-avatar" id="headerUserAvatar">A</div>
+        <div class="user-details">
+          <span id="headerUserName" class="user-name">User</span>
+          <span id="headerUserRole" class="badge role-badge">Role</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-secondary btn-sm">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- VIEW 1: Login Screen -->
+    <section id="loginSection" class="auth-wrapper">
+      <div class="auth-card glass-panel">
+        <div class="auth-header">
+          <div class="security-badge">SECURE RBAC PORTAL</div>
+          <h2>Sign In to ExamGuard</h2>
+          <p>Role-Based Authentication for Exam Board Admins, Custodians, and Investigators</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="loginEmail" placeholder="admin@examguard.local" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="loginPassword" placeholder="••••••••••••" required
+                autocomplete="current-password">
+            </div>
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="btn btn-primary btn-block">
+            <span class="btn-text">Authenticate & Sign In</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </form>
+
+        <div class="quick-credentials">
+          <div class="credentials-title">Quick Demo Logins</div>
+          <div class="cred-chips">
+            <button type="button" class="cred-chip" id="fillAdminCreds">
+              <span class="chip-role admin-pill">Admin</span>
+              <code>admin@examguard.local</code>
+            </button>
+            <button type="button" class="cred-chip" id="fillCustCreds">
+              <span class="chip-role custodian-pill">Custodian</span>
+              <code>cust1@examguard.local</code>
+            </button>
+          </div>
+          <small class="cred-note">Default demo password for seeded accounts: <code>AdminPass123!</code> or
+            <code>CustodianPass123!</code></small>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: Authenticated Dashboard -->
+    <section id="dashboardSection" class="dashboard-wrapper hidden">
+      <!-- Role Navigation Bar -->
+      <nav class="dashboard-nav glass-panel">
+        <div class="nav-tabs">
+          <button class="nav-tab active" data-tab="overviewTab">
+            <span class="tab-icon">📊</span> Overview
+          </button>
+          <button class="nav-tab admin-only" data-tab="usersTab">
+            <span class="tab-icon">👥</span> User Management
+          </button>
+          <button class="nav-tab" data-tab="examsTab">
+            <span class="tab-icon">📝</span> Examinations
+          </button>
+          <button class="nav-tab admin-only" data-tab="auditTab">
+            <span class="tab-icon">📜</span> Audit Trail
+          </button>
+          <button class="nav-tab" data-tab="securityTab">
+            <span class="tab-icon">🔐</span> Security & API Scope
+          </button>
+        </div>
+      </nav>
+
+      <!-- TAB 1: Overview -->
+      <div id="overviewTab" class="tab-content active">
+        <!-- Welcome Hero -->
+        <div class="hero-banner glass-panel">
+          <div class="hero-text">
+            <h2>Welcome back, <span id="welcomeUserName">User</span></h2>
+            <p id="roleDescription">Role-based capabilities for this session:</p>
+            <div id="roleBadgeContainer" class="hero-badges"></div>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <span class="stat-label">Session Role</span>
+              <span class="stat-value" id="statRole">-</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Account Status</span>
+              <span class="stat-value text-success" id="statStatus">Active</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Token Protocol</span>
+              <span class="stat-value">JWT Bearer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capability Cards Grid -->
+        <div class="capability-grid">
+          <div class="cap-card glass-panel admin-feature">
+            <div class="cap-header">
+              <span class="cap-icon">🛡️</span>
+              <div>
+                <h3>Admin (Exam Board) Scope</h3>
+                <span class="cap-status" id="adminScopeStatus">Checking...</span>
+              </div>
+            </div>
+            <p>Full administrative oversight: Create, manage, deactivate users, adjust roles, schedule examinations, and
+              inspect system audit logs.</p>
+            <ul class="cap-list">
+              <li>Full User Management (<code>/api/users</code>)</li>
+              <li>Examination Scheduling & Transitions (<code>/api/examinations</code>)</li>
+              <li>Security Audit Events Logging (<code>/api/audit-logs</code>)</li>
+            </ul>
+          </div>
+
+          <div class="cap-card glass-panel custodian-feature">
+            <div class="cap-header">
+              <span class="cap-icon">📦</span>
+              <div>
+                <h3>Custodian Scope</h3>
+                <span class="cap-status" id="custodianScopeStatus">Checking...</span>
+              </div>
+            </div>
+            <p>Restricted custodial access: View only specifically assigned, non-draft examinations. User administration
+              endpoints return 403 Forbidden.</p>
+            <ul class="cap-list">
+              <li>Assigned Examinations Read-Only</li>
+              <li>No user management permissions</li>
+              <li>Cannot see unassigned or draft papers</li>
+            </ul>
+          </div>
+
+          <div class="cap-card glass-panel investigator-feature">
+            <div class="cap-header">
+              <span class="cap-icon">🔍</span>
+              <div>
+                <h3>Investigator Scope</h3>
+                <span class="cap-status" id="investigatorScopeStatus">Checking...</span>
+              </div>
+            </div>
+            <p>Forensic inspection access: Read access to all non-draft examination records to investigate leaks or
+              compliance anomalies.</p>
+            <ul class="cap-list">
+              <li>All Non-Draft Examinations</li>
+              <li>No user creation permissions</li>
+              <li>Module 3/4 forensic hook ready</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: User Management (Admin Only) -->
+      <div id="usersTab" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>User Management</h2>
+            <p>Administers system identities, role permissions, and active statuses</p>
+          </div>
+          <button id="openCreateUserModalBtn" class="btn btn-primary">
+            <span>+ Create New User</span>
+          </button>
+        </div>
+
+        <!-- Users Filter Bar -->
+        <div class="filter-bar glass-panel">
+          <div class="filter-group">
+            <label for="roleFilter">Filter by Role:</label>
+            <select id="roleFilter" class="form-select">
+              <option value="">All Roles (Admin, Custodian, Investigator)</option>
+              <option value="Admin">Admin</option>
+              <option value="Custodian">Custodian</option>
+              <option value="Investigator">Investigator</option>
+            </select>
+          </div>
+          <button id="refreshUsersBtn" class="btn btn-secondary btn-sm">↻ Refresh</button>
+        </div>
+
+        <!-- User Table Card -->
+        <div class="table-card glass-panel">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User Details</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody">
+                <tr>
+                  <td colspan="5" class="text-center py-4">Loading users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Examinations -->
+      <div id="examsTab" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Examinations</h2>
+            <p>Role-scoped examinations overview (Drafts visible only to Admins)</p>
+          </div>
+          <button id="openCreateExamModalBtn" class="btn btn-primary admin-only">
+            <span>+ Create Examination</span>
+          </button>
+        </div>
+
+        <div class="table-card glass-panel">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Scheduled Date</th>
+                  <th>Assigned Custodians</th>
+                </tr>
+              </thead>
+              <tbody id="examTableBody">
+                <tr>
+                  <td colspan="5" class="text-center py-4">Loading examinations...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Audit Logs (Admin Only) -->
+      <div id="auditTab" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>Security Audit Logs</h2>
+            <p>System activity events captured without logging credentials or secrets</p>
+          </div>
+          <button id="refreshAuditBtn" class="btn btn-secondary btn-sm">↻ Refresh Logs</button>
+        </div>
+
+        <div class="table-card glass-panel">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action</th>
+                  <th>Outcome</th>
+                  <th>Actor / IP</th>
+                  <th>Resource</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr>
+                  <td colspan="5" class="text-center py-4">Loading audit logs...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Security & Scope -->
+      <div id="securityTab" class="tab-content">
+        <div class="section-header">
+          <div>
+            <h2>System Security Architecture</h2>
+            <p>Module 1 Foundation Controls & Enforcement</p>
+          </div>
+        </div>
+
+        <div class="security-grid">
+          <div class="sec-card glass-panel">
+            <h3>🔐 Authentication & Hashing</h3>
+            <p>Passwords hashed with <code>bcryptjs</code> (12 rounds). Zero plaintext passwords or hashes exposed in
+              any API response or audit log.</p>
+            <div class="sec-metric"><strong>JWT Lifespan:</strong> 1 Hour</div>
+          </div>
+          <div class="sec-card glass-panel">
+            <h3>🛡️ Last-Admin Safeguard</h3>
+            <p>Pre-checks, conditional updates, and post-check rollback prevent demotion or deactivation of the last
+              active administrator.</p>
+            <div class="sec-metric"><strong>Admin Quorum:</strong> At least 1 active Admin guaranteed</div>
+          </div>
+          <div class="sec-card glass-panel">
+            <h3>🚫 Future Module Hooks</h3>
+            <p>Endpoints reserved for Module 2 (Custody Chain) and Module 3/4 (Forensic Leak Detection) return explicit
+              <code>501 Not Implemented</code> placeholders.
+            </p>
+            <div class="sec-metric"><strong>Endpoints:</strong> <code>/api/custody/*</code>,
+              <code>/api/investigations/*</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL: Create User -->
+    <div id="createUserModal" class="modal-overlay hidden">
+      <div class="modal-card glass-panel">
+        <div class="modal-header">
+          <h3>Create New System User</h3>
+          <button id="closeUserModalBtn" class="modal-close">&times;</button>
+        </div>
+        <form id="createUserForm" class="modal-body">
+          <div class="form-group">
+            <label for="newUserName">Full Name</label>
+            <input type="text" id="newUserName" required placeholder="e.g. Jane Doe">
+          </div>
+          <div class="form-group">
+            <label for="newUserEmail">Email Address</label>
+            <input type="email" id="newUserEmail" required placeholder="e.g. jane@examguard.local">
+          </div>
+          <div class="form-group">
+            <label for="newUserRole">Role Assignment</label>
+            <select id="newUserRole" class="form-select" required>
+              <option value="Custodian">Custodian (Material Handling)</option>
+              <option value="Investigator">Investigator (Audit & Analysis)</option>
+              <option value="Admin">Admin (Exam Board Authority)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newUserPassword">Initial Password</label>
+            <input type="password" id="newUserPassword" required minlength="12"
+              placeholder="Min 12 chars (Upper, lower, digit)">
+            <small class="form-help">Must contain upper, lower, and numeric characters (min 12 chars).</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="cancelUserModalBtn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="submitCreateUserBtn" class="btn btn-primary">Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL: Create Examination -->
+    <div id="createExamModal" class="modal-overlay hidden">
+      <div class="modal-card glass-panel">
+        <div class="modal-header">
+          <h3>Schedule New Examination</h3>
+          <button id="closeExamModalBtn" class="modal-close">&times;</button>
+        </div>
+        <form id="createExamForm" class="modal-body">
+          <div class="form-group">
+            <label for="newExamCode">Examination Code</label>
+            <input type="text" id="newExamCode" required placeholder="e.g. CS-401">
+          </div>
+          <div class="form-group">
+            <label for="newExamTitle">Title</label>
+            <input type="text" id="newExamTitle" required placeholder="e.g. Advanced Cryptography Final">
+          </div>
+          <div class="form-group">
+            <label for="newExamDate">Scheduled Date & Time</label>
+            <input type="datetime-local" id="newExamDate" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" id="cancelExamModalBtn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" id="submitCreateExamBtn" class="btn btn-primary">Save Examination</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
